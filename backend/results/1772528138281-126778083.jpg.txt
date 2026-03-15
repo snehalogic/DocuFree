@@ -1,0 +1,37 @@
+Title of paper:
+Effect of Explainable Artificial Intelligence on Trust of Mental Health
+Professionals in an Al-Based System for Suicide Prevention
+Introduction
+Artificial Intelligence (Al) is increasingly being integrated into mental health care, particularly for early
+detection of suicidal ideation (SI). Al systems, especially those based on Large Language Models (LLMs),
+can analyze patient-generated text and identify warning signs remotely. However, despite their
+technological potential, the success of such systems depends largely on whether Mental Health
+Professionals (MHPs) trust and accept them.
+One of the major concerns in medical Al is the “black-box” nature of many models, where decisions are
+made without clear explanations. Explainable Artificial Intelligence (XAI) aims to address this issue by
+providing transparency through techniques such as LIME, which highlight important words influencing
+predictions. This study investigates how XAl affects trust among MHPs using an Al system called
+Boamente, designed to detect suicidal ideation in Brazilian Portuguese texts.
+Methodology
+The study followed an online, experimental, randomized, single-masked research design. A total of 78
+Brazilian mental health professionals (psychologists and psychiatrists) participated. Participants had
+clinical experience and some familiarity with Al concepts.
+They were randomly divided into four groups:
+
+* Groups A and B: System without explanations
+
++ Groups C and D: System with explanations
+
+«Some groups also received a 20-minute educational video explaining how the Al system works
+Participants interacted with the Boamente web interface and evaluated the system's predictions
+regarding suicidal ideation. Trust levels were measured using Likert-scale questionnaires. The quality of
+explanations was assessed using the System Causability Scale (SCS). Statistical analyses such as ANCOVA
+and General Linear Models (GLM) were used to evaluate the effects of explanations and educational
+intervention on trust.
+Results
+The findings revealed several important outcomes:
+
+1. Providing explanations significantly reduced trust.
+
+Participants who received explanations (Groups C and D) reported lower trust compared to
+those who did not receive explanations.

@@ -1,0 +1,6 @@
+Semantic Elements
+Semantic elements are those that convey their meaning and purpose clearly
+through their name alone.
+
+<section> tag
+It defines a section in the document

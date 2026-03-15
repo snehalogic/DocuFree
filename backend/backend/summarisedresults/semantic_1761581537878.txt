@@ -1,0 +1,8 @@
+{
+  "title": "semantic",
+  "filename": "semantic_1761581537878.txt",
+  "wordCount": 17,
+  "date": "2025-10-27T16:12:17.878Z",
+  "snippet": "Semantic Elements Semantic elements are those that convey their meaning and purpose clearly through their name alone.",
+  "content": "Semantic Elements Semantic elements are those that convey their meaning and purpose clearly through their name alone."
+}

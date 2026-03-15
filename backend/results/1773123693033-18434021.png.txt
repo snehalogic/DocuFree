@@ -1,0 +1,9 @@
+What is Data Science?
+
+Welcome to this course on Data Science. If you are active on Fb/Insta/X, share your
+Data Science journey on these platforms and tag me. | would love to see your
+progress.
+
+| am so happy you decided to learn Data Science with me in my style. Lets step
+back and talk a bit about why do we need data science. What kind of tasks we will
+do as a data scientist in an organization
