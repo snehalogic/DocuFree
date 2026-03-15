@@ -30,6 +30,7 @@ DocuFree is an AI-powered document processing web application that allows users 
 ### Backend
 - Node.js
 - Express
+- Python
 
 ### AI Services
 - Google Gemini API
@@ -69,8 +70,8 @@ git clone https://github.com/snehalogic/DocuFree.git
 npm install
 
 ## Create a .env file and add:
-GEMINI_API_KEY=your_api_key
-MONGODB_URI=your_database_uri
+- GEMINI_API_KEY=your_api_key
+- MONGODB_URI=your_database_uri
 
 ## Run the project:
 npm start
