@@ -4,7 +4,6 @@ import Document from "../models/Document.js";
 
 const router = express.Router();
 
-// GET /api/documents — returns all documents for logged-in user
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const docs = await Document.find({ userId: req.userId })

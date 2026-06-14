@@ -13,7 +13,6 @@ interface Translation {
   timestamp: string;
 }
 
-// ✅ Updated to match MongoDB document shape
 interface OcrResultFile {
   _id: string;
   filename: string;
@@ -69,7 +68,6 @@ const TranslationPage: React.FC = () => {
     if (showPast) fetchPastTranslations();
   }, [showPast]);
 
-  // ✅ FIXED — fetches from /api/documents (MongoDB), filters docs with extractedText
   const openOcrPicker = async () => {
     setShowOcrPicker(true);
     setOcrError(null);
@@ -84,7 +82,6 @@ const TranslationPage: React.FC = () => {
 
       const docs = await res.json();
 
-      // Only show documents where OCR has been run
       const ocrDocs = Array.isArray(docs)
         ? docs.filter((d: any) => d.extractedText && d.extractedText.trim().length > 0)
         : [];
@@ -99,7 +96,6 @@ const TranslationPage: React.FC = () => {
     }
   };
 
-  // ✅ FIXED — pastes extractedText directly from MongoDB, no extra fetch needed
   const handleUseOcrFile = (file: OcrResultFile) => {
     setInput(file.extractedText);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -435,7 +431,6 @@ const TranslationPage: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* ── OCR PICKER MODAL ── */}
         <AnimatePresence>
           {showOcrPicker && (
             <motion.div className="tp-ocr-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowOcrPicker(false)}>

@@ -27,9 +27,7 @@ export default function LoginPage() {
       });
       const body = await res.json().catch(() => ({}));
       if (res.ok && body.token) {
-        // Save token and user info
         localStorage.setItem("token", body.token);
-        // backend returns `user` in auth.js — save it for dashboard
         if (body.user) localStorage.setItem("user", JSON.stringify(body.user));
         navigate("/dashboard");
       } else {
@@ -44,7 +42,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-indigo-50 via-white to-sky-50 relative overflow-hidden">
-      {/* Decorative circles (purely visual) */}
       <div className="absolute -left-20 -top-20 w-72 h-72 bg-gradient-to-br from-indigo-200 to-indigo-400 rounded-full opacity-20 filter blur-3xl animate-blob" />
       <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-gradient-to-br from-sky-200 to-emerald-200 rounded-full opacity-15 filter blur-3xl animate-blob animation-delay-2000" />
 
@@ -134,7 +131,6 @@ export default function LoginPage() {
         </div>
       </form>
 
-      {/* Custom CSS for animations and gradients */}
       <style>{`
         /* Gradient button background */
         .btn-gradient {

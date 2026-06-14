@@ -16,11 +16,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 5001;
 
-/* Enable CORS */
 app.use(cors());
 app.use(express.json());
 
-/* Ensure directories exist */
 const uploadsDir = path.join(__dirname, "uploads");
 const outputsDir = path.join(__dirname, "outputs");
 
@@ -30,23 +28,19 @@ const outputsDir = path.join(__dirname, "outputs");
   }
 });
 
-/* File Upload Config */
 const upload = multer({
   dest: uploadsDir,
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
 });
 
-/* Helper: Get file extension */
 const getExtension = (filename) => {
   return path.extname(filename).toLowerCase().slice(1);
 };
 
-/* Helper: Get MIME type */
 const getMimeType = (ext) => {
   return mime.lookup(ext) || "application/octet-stream";
 };
 
-/* Image Conversions */
 const convertImage = async (inputPath, targetExt) => {
   const image = sharp(inputPath);
   const metadata = await image.metadata();
@@ -74,7 +68,6 @@ const convertImage = async (inputPath, targetExt) => {
       outputBuffer = await image.tiff().toBuffer();
       break;
     case "pdf":
-      // Convert image to PDF
       const pdfDoc = await PDFDocument.create();
       const imgBuffer = fs.readFileSync(inputPath);
       let pdfImage;
@@ -102,7 +95,6 @@ const convertImage = async (inputPath, targetExt) => {
   return outputBuffer;
 };
 
-/* PDF Conversions */
 const convertPDF = async (inputPath, targetExt) => {
   const pdfBuffer = fs.readFileSync(inputPath);
   
@@ -110,7 +102,6 @@ const convertPDF = async (inputPath, targetExt) => {
     case "jpg":
     case "jpeg":
     case "png":
-      // PDF to image - use LibreOffice (sharp doesn't support PDF directly)
       return new Promise((resolve, reject) => {
         libre.convert(pdfBuffer, targetExt === "jpg" || targetExt === "jpeg" ? ".jpg" : ".png", undefined, (err, done) => {
           if (err) reject(err);
@@ -118,7 +109,6 @@ const convertPDF = async (inputPath, targetExt) => {
         });
       });
     default:
-      // Use LibreOffice for other conversions
       return new Promise((resolve, reject) => {
         libre.convert(pdfBuffer, `.${targetExt}`, undefined, (err, done) => {
           if (err) reject(err);
@@ -128,28 +118,22 @@ const convertPDF = async (inputPath, targetExt) => {
   }
 };
 
-/* Document Conversions (DOCX, DOC, etc.) */
 const convertDocument = async (inputPath, sourceExt, targetExt) => {
   const buffer = fs.readFileSync(inputPath);
   
   switch (targetExt) {
     case "txt":
       if (sourceExt === "docx") {
-        // DOCX to TXT
         const result = await mammoth.extractRawText({ buffer });
         return Buffer.from(result.value, "utf-8");
       }
-      // Use LibreOffice for other formats
       break;
     case "pdf":
-      // Use LibreOffice for document to PDF
       break;
     default:
-      // Use LibreOffice for other conversions
       break;
   }
   
-  // Fallback to LibreOffice for complex conversions
   return new Promise((resolve, reject) => {
     libre.convert(buffer, `.${targetExt}`, undefined, (err, done) => {
       if (err) reject(err);
@@ -158,18 +142,15 @@ const convertDocument = async (inputPath, sourceExt, targetExt) => {
   });
 };
 
-/* Text Conversions */
 const convertText = async (inputPath, targetExt) => {
   const textContent = fs.readFileSync(inputPath, "utf-8");
   
   switch (targetExt) {
     case "pdf":
-      // Text to PDF
       const pdfDoc = await PDFDocument.create();
-      const page = pdfDoc.addPage([612, 792]); // Letter size
+      const page = pdfDoc.addPage([612, 792]); 
       const { width, height } = page.getSize();
       
-      // Simple text rendering (basic implementation)
       page.drawText(textContent, {
         x: 50,
         y: height - 50,
@@ -179,7 +160,6 @@ const convertText = async (inputPath, targetExt) => {
       
       return await pdfDoc.save();
     case "docx":
-      // Text to DOCX - use LibreOffice
       return new Promise((resolve, reject) => {
         libre.convert(Buffer.from(textContent, "utf-8"), ".docx", undefined, (err, done) => {
           if (err) reject(err);
@@ -191,28 +171,22 @@ const convertText = async (inputPath, targetExt) => {
   }
 };
 
-/* Main Conversion Handler */
 const convertFile = async (inputPath, sourceExt, targetExt) => {
   sourceExt = sourceExt.toLowerCase();
   targetExt = targetExt.toLowerCase();
   
-  // If same format, just return the file
   if (sourceExt === targetExt) {
     return fs.readFileSync(inputPath);
   }
   
-  // Image conversions
   const imageFormats = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff"];
   if (imageFormats.includes(sourceExt)) {
-    // If converting to another image format, use sharp
     if (imageFormats.includes(targetExt)) {
       return await convertImage(inputPath, targetExt);
     }
-    // If converting image to PDF, use pdf-lib
     if (targetExt === "pdf") {
       return await convertImage(inputPath, targetExt);
     }
-    // For other conversions, use LibreOffice
     return new Promise((resolve, reject) => {
       const buffer = fs.readFileSync(inputPath);
       libre.convert(buffer, `.${targetExt}`, undefined, (err, done) => {
@@ -222,23 +196,19 @@ const convertFile = async (inputPath, sourceExt, targetExt) => {
     });
   }
   
-  // PDF conversions
   if (sourceExt === "pdf") {
     return await convertPDF(inputPath, targetExt);
   }
   
-  // Document conversions
   const docFormats = ["docx", "doc", "odt", "rtf"];
   if (docFormats.includes(sourceExt)) {
     return await convertDocument(inputPath, sourceExt, targetExt);
   }
   
-  // Text conversions
   if (sourceExt === "txt") {
     return await convertText(inputPath, targetExt);
   }
   
-  // PPT conversions
   const pptFormats = ["ppt", "pptx", "odp"];
   if (pptFormats.includes(sourceExt)) {
     return new Promise((resolve, reject) => {
@@ -250,7 +220,6 @@ const convertFile = async (inputPath, sourceExt, targetExt) => {
     });
   }
   
-  // Fallback to LibreOffice for any other conversions
   return new Promise((resolve, reject) => {
     const buffer = fs.readFileSync(inputPath);
     libre.convert(buffer, `.${targetExt}`, undefined, (err, done) => {
@@ -260,7 +229,6 @@ const convertFile = async (inputPath, sourceExt, targetExt) => {
   });
 };
 
-/* Convert Route */
 app.post("/convert", upload.single("file"), async (req, res) => {
   let inputPath = null;
   let outputPath = null;
@@ -271,7 +239,6 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     }
 
     if (!req.body.target) {
-      // Cleanup uploaded file
       if (req.file.path && fs.existsSync(req.file.path)) {
         fs.unlinkSync(req.file.path);
       }
@@ -282,7 +249,6 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     const sourceExt = getExtension(req.file.originalname);
     const targetExt = req.body.target.toLowerCase().replace(".", "");
     
-    // Validate file extension
     if (!sourceExt) {
       if (inputPath && fs.existsSync(inputPath)) {
         fs.unlinkSync(inputPath);
@@ -290,7 +256,6 @@ app.post("/convert", upload.single("file"), async (req, res) => {
       return res.status(400).json({ error: "File must have an extension" });
     }
 
-    // Validate target extension
     const validExtensions = [
       "jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff",
       "pdf", "docx", "doc", "odt", "rtf", "txt",
@@ -309,27 +274,23 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     
     console.log(`🔄 Converting ${sourceExt.toUpperCase()} → ${targetExt.toUpperCase()}...`);
     
-    // Convert the file
     const outputBuffer = await convertFile(inputPath, sourceExt, targetExt);
     
     if (!outputBuffer || outputBuffer.length === 0) {
       throw new Error("Conversion produced empty output");
     }
     
-    // Save output
     const timestamp = Date.now();
     outputPath = path.join(outputsDir, `converted-${timestamp}.${targetExt}`);
     fs.writeFileSync(outputPath, outputBuffer);
     
     console.log(`✅ Conversion successful: ${outputBuffer.length} bytes`);
     
-    // Send file
     const mimeType = getMimeType(targetExt);
     res.setHeader("Content-Type", mimeType);
     res.setHeader("Content-Disposition", `attachment; filename="converted.${targetExt}"`);
     
     res.sendFile(outputPath, (err) => {
-      // Cleanup
       if (inputPath && fs.existsSync(inputPath)) {
         try {
           fs.unlinkSync(inputPath);
@@ -353,7 +314,6 @@ app.post("/convert", upload.single("file"), async (req, res) => {
   } catch (error) {
     console.error("❌ Conversion error:", error.message || error);
     
-    // Cleanup on error
     if (inputPath && fs.existsSync(inputPath)) {
       try {
         fs.unlinkSync(inputPath);
@@ -379,7 +339,6 @@ app.post("/convert", upload.single("file"), async (req, res) => {
   }
 });
 
-/* Get supported formats */
 app.get("/formats", (req, res) => {
   res.json({
     supported: {
@@ -397,12 +356,10 @@ app.get("/formats", (req, res) => {
   });
 });
 
-/* Health Check */
 app.get("/", (req, res) => {
   res.send("DocuFree File Converter Backend is running 🚀");
 });
 
-/* Start Server */
 app.listen(PORT, () => {
   console.log(`✅ File converter backend running at http://localhost:${PORT}`);
   console.log(`📁 Uploads directory: ${uploadsDir}`);

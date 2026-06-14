@@ -6,7 +6,6 @@ import "./index.css";
 
 console.log("✅ main.tsx loaded");
 
-// Import components - UPDATE THESE PATHS
 import App from "./App";
 import OcrResultsPage from "./pages/OcrResultsPage";
 

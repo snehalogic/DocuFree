@@ -231,7 +231,6 @@ export default function App() {
 
   const handleLogout = () => {
     try {
-      // Note: localStorage might not work in artifacts, but kept for compatibility
       console.log("Logging out...");
     } catch (err) {
       console.error("Logout error:", err);
@@ -280,7 +279,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Top buttons */}
       <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <button 
           onClick={() => {
@@ -330,7 +328,6 @@ export default function App() {
         </button>
       </div>
 
-      {/* Toolbar + Documents */}
       <div className="max-w-7xl mx-auto px-6 py-6 bg-white rounded-lg border shadow-sm">
         <Toolbar 
           onUpload={() => setUploadModalOpen(true)} 
@@ -418,7 +415,6 @@ export default function App() {
         )}
       </div>
 
-      {/* Upload Modal */}
       {uploadModalOpen && (
         <UploadModal
           open={uploadModalOpen}
@@ -427,7 +423,6 @@ export default function App() {
         />
       )}
 
-      {/* Preview Modal */}
       {previewDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div 
@@ -475,7 +470,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Document Details Panel */}
       <DocumentDetailsPanel 
         open={detailsPanelOpen} 
         onOpenChange={setDetailsPanelOpen} 
@@ -483,7 +477,6 @@ export default function App() {
         onAction={handleDocumentAction} 
       />
 
-      {/* OCR Loading Overlay */}
       {ocrLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full mx-4">

@@ -47,7 +47,6 @@ import FileConverterPage from "./pages/FileConverterPage";
 import Aiassistance from "./pages/Aiassistance";
 console.log("✅ App.tsx loaded");
 
-// Protected Route wrapper - NOW checks for "token" (not "authToken")
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user");
@@ -74,12 +73,10 @@ export default function App() {
 
   return (
     <Routes>
-      {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 
-      {/* Protected Routes - Dashboard */}
       <Route
         path="/dashboard"
         element={
@@ -89,7 +86,6 @@ export default function App() {
         }
       />
 
-      {/* Protected Routes - OCR Results */}
       <Route
         path="/ocrresults"
         element={
@@ -108,7 +104,6 @@ export default function App() {
 />
 
 
-      {/* Protected Routes - Other Features */}
       <Route
         path="/summarisation"
         element={
@@ -137,7 +132,6 @@ export default function App() {
 />
 
 
-      {/* 404 Page */}
       <Route
         path="*"
         element={

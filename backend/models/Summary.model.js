@@ -1,4 +1,3 @@
-// backend/models/Summary.model.js
 import mongoose from 'mongoose';
 
 const summarySchema = new mongoose.Schema({
@@ -28,10 +27,9 @@ const summarySchema = new mongoose.Schema({
     index: true
   }
 }, {
-  timestamps: true // Adds createdAt and updatedAt
+  timestamps: true 
 });
 
-// Index for faster queries
 summarySchema.index({ date: -1 });
 
 const Summary = mongoose.model('Summary', summarySchema);

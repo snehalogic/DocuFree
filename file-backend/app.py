@@ -1,15 +1,8 @@
 """
 DocuFree File Converter — Python Backend
 Run: python app.py  →  http://localhost:5001
-
-This script auto-installs any missing packages using the SAME Python
-interpreter that is running it, so you never get version-mismatch errors.
 """
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  AUTO-INSTALL MISSING PACKAGES  (runs before anything else)
-#  Uses sys.executable so it always targets the correct Python environment.
-# ══════════════════════════════════════════════════════════════════════════════
 import sys, subprocess, importlib, os, io, uuid, re, tempfile, traceback
 from pathlib import Path
 
@@ -46,7 +39,6 @@ if _missing:
              "--break-system-packages"],
             capture_output=True, text=True
         )
-        # retry without --break-system-packages if it fails
         if _r.returncode != 0:
             _r = subprocess.run(
                 [sys.executable, "-m", "pip", "install", _pkg, "--quiet"],
@@ -55,12 +47,9 @@ if _missing:
         print("OK" if _r.returncode == 0 else f"FAILED ({_r.stderr.strip()[:80]})")
     print()
 
-# ── Now safe to import Flask ──────────────────────────────────────────────────
 from flask import Flask, request, jsonify, send_file
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  FLASK APP
-# ══════════════════════════════════════════════════════════════════════════════
+
 app = Flask(__name__)
 
 @app.after_request
@@ -147,7 +136,6 @@ def convert():
         if not os.path.exists(out_path) or os.path.getsize(out_path) == 0:
             return jsonify({"error": "Conversion produced no output"}), 500
 
-        # ── Read into memory BEFORE finally deletes the temp file ────────────
         with open(out_path, "rb") as fh:
             buf = io.BytesIO(fh.read())
         buf.seek(0)
@@ -192,10 +180,6 @@ def _dispatch(src_ext: str, target: str, src: str, out: str):
     else:
         raise ValueError(f"Conversion .{src_ext}→.{target} not implemented")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  SHARED HELPERS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _safe(t: str) -> str:
     """Escape XML special chars for reportlab."""
@@ -248,10 +232,6 @@ def _add_para(doc, text: str, size: float):
         run.font.size = Pt(max(round(size), 8))
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  IMAGE CONVERTERS
-# ══════════════════════════════════════════════════════════════════════════════
-
 def image_to_image(src: str, out: str, target: str):
     from PIL import Image
     img = Image.open(src)
@@ -269,7 +249,6 @@ def pdf_to_image(src: str, out: str, target: str):
     from PIL import Image
     fmt = "JPEG" if target == "jpg" else "PNG"
 
-    # pypdfium2 — fast, no system deps
     try:
         import pypdfium2 as pdfium
         doc  = pdfium.PdfDocument(src)
@@ -282,7 +261,6 @@ def pdf_to_image(src: str, out: str, target: str):
     except ImportError:
         pass
 
-    # pdf2image (needs poppler installed on system)
     try:
         from pdf2image import convert_from_path
         pages = convert_from_path(src, dpi=150)
@@ -299,14 +277,10 @@ def pdf_to_image(src: str, out: str, target: str):
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  PDF → TEXT  (3-layer fallback)
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _pdf_text(src: str) -> str:
     """Extract text from PDF. Tries pdfminer → pdfplumber → pypdf."""
 
-    # 1. pdfminer.six  (most reliable)
     try:
         from pdfminer.high_level import extract_text as _pdfminer_extract
         text = (_pdfminer_extract(src) or "").strip()
@@ -317,7 +291,6 @@ def _pdf_text(src: str) -> str:
     except Exception:
         pass
 
-    # 2. pdfplumber
     try:
         import pdfplumber
         parts = []
@@ -333,7 +306,6 @@ def _pdf_text(src: str) -> str:
     except Exception:
         pass
 
-    # 3. pypdf
     try:
         import pypdf
         parts = []
@@ -358,14 +330,9 @@ def pdf_to_txt(src: str, out: str):
         f.write(_pdf_text(src))
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  PDF → DOCX  (3-layer fallback)
-# ══════════════════════════════════════════════════════════════════════════════
-
 def pdf_to_docx(src: str, out: str):
     errors = []
 
-    # ── 1. pdfminer — best: gives per-char font sizes ────────────────────────
     try:
         from pdfminer.high_level import extract_pages as _ep
         from pdfminer.layout import LTTextBox, LTTextLine, LTChar, LTAnno
@@ -395,7 +362,6 @@ def pdf_to_docx(src: str, out: str):
     except Exception as e:
         errors.append(f"pdfminer error: {e}")
 
-    # ── 2. pdfplumber — good: word-level with size attr ──────────────────────
     try:
         import pdfplumber
         doc   = _blank_docx()
@@ -419,7 +385,6 @@ def pdf_to_docx(src: str, out: str):
                             doc.add_paragraph(ln.strip()); found = True
                     continue
 
-                # Group words into visual lines by Y-bucket
                 buckets: dict = {}
                 for w in words:
                     b = round(float(w.get("top", 0)) / 5) * 5
@@ -445,7 +410,7 @@ def pdf_to_docx(src: str, out: str):
     except Exception as e:
         errors.append(f"pdfplumber error: {e}")
 
-    # ── 3. pypdf — plain text fallback ───────────────────────────────────────
+
     try:
         import pypdf
         doc   = _blank_docx()
@@ -473,10 +438,6 @@ def pdf_to_docx(src: str, out: str):
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  DOCX CONVERTERS
-# ══════════════════════════════════════════════════════════════════════════════
-
 def docx_to_pdf(src: str, out: str):
     from docx import Document
     from reportlab.platypus import Paragraph, Spacer
@@ -499,11 +460,6 @@ def docx_to_txt(src: str, out: str):
     with open(out, "w", encoding="utf-8") as f:
         f.write("\n".join(p.text for p in Document(src).paragraphs))
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  TXT CONVERTERS
-# ══════════════════════════════════════════════════════════════════════════════
-
 def txt_to_pdf(src: str, out: str):
     from reportlab.platypus import Paragraph, Spacer
     styles = _styles(); story = []
@@ -521,10 +477,6 @@ def txt_to_docx(src: str, out: str):
         for line in f: doc.add_paragraph(line.rstrip())
     doc.save(out)
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  SPREADSHEET CONVERTERS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def csv_to_xlsx(src: str, out: str):
     import pandas as pd
@@ -568,10 +520,6 @@ def xlsx_to_pdf(src: str, out: str):
         if os.path.exists(tmp): os.remove(tmp)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  MARKDOWN CONVERTERS
-# ══════════════════════════════════════════════════════════════════════════════
-
 def _md_body(src: str) -> str:
     """Markdown file → HTML body string. markdown → mistune → regex."""
     text = open(src, "r", encoding="utf-8").read()
@@ -596,7 +544,6 @@ def _md_body(src: str) -> str:
     except Exception:
         pass
 
-    # Pure-Python regex fallback
     lines, out_lines, in_code = text.split("\n"), [], False
     for ln in lines:
         if ln.startswith("```"):
@@ -661,9 +608,6 @@ def md_to_pdf(src: str, out: str):
         if os.path.exists(tmp): os.remove(tmp)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  HTML CONVERTERS
-# ══════════════════════════════════════════════════════════════════════════════
 
 def _html_story(html_text: str) -> list:
     """Parse HTML → reportlab story. bs4 → lxml → regex."""
@@ -690,7 +634,6 @@ def _html_story(html_text: str) -> list:
         else: story.append(Paragraph(s, styles["Normal"]))
         story.append(Spacer(1,4))
 
-    # bs4
     try:
         from bs4 import BeautifulSoup
         soup = BeautifulSoup(html_text, "html.parser")
@@ -703,7 +646,7 @@ def _html_story(html_text: str) -> list:
     except Exception:
         pass
 
-    # lxml
+  
     try:
         from lxml import html as lh
         tree = lh.fromstring(html_text)
@@ -717,7 +660,7 @@ def _html_story(html_text: str) -> list:
     except Exception:
         pass
 
-    # regex
+
     clean = re.sub(r"<(style|script)[^>]*>.*?</\1>", "", html_text, flags=re.DOTALL|re.I)
     for m in re.finditer(r"<(h[1-6]|p|li|pre)([^>]*)>(.*?)</\1>",
                          clean, re.DOTALL|re.I):
@@ -761,9 +704,6 @@ def html_to_txt(src: str, out: str):
     with open(out,"w",encoding="utf-8") as f: f.write(text)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  ENTRY POINT
-# ══════════════════════════════════════════════════════════════════════════════
 if __name__ == "__main__":
     print(f"\n{'='*60}")
     print(f"  🚀  DocuFree Converter  →  http://localhost:5001")

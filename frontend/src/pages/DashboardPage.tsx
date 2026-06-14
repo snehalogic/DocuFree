@@ -15,7 +15,6 @@ type IndexItemObject = {
   uploadDate?: string;
 };
 
-// ✅ FIX 1 — Updated Doc type to match MongoDB response fields
 type Doc = {
   id: string;
   name: string;
@@ -26,7 +25,6 @@ type Doc = {
   mime?: string;
 };
 
-// Resizable Preview Modal Component
 const ResizablePreviewModal = ({ previewDoc, closePreview }: { previewDoc: Doc; closePreview: () => void }) => {
   const [size, setSize] = useState({ width: 800, height: 600 });
   const [isResizing, setIsResizing] = useState(false);
@@ -79,7 +77,6 @@ const ResizablePreviewModal = ({ previewDoc, closePreview }: { previewDoc: Doc; 
       style={{ width: size.width, height: size.height }}
       className="relative z-10 bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
     >
-      {/* Header with Close Button */}
       <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
         <div className="font-semibold text-lg truncate pr-4">{previewDoc.name}</div>
         <button 
@@ -90,7 +87,6 @@ const ResizablePreviewModal = ({ previewDoc, closePreview }: { previewDoc: Doc; 
         </button>
       </div>
       
-      {/* Content Area */}
       <div className="flex-1 overflow-auto bg-gray-50 relative">
         {previewDoc.fileType && ["png","jpg","jpeg","webp"].includes(previewDoc.fileType) ? (
           <div className="flex items-center justify-center min-h-full p-4">
@@ -124,7 +120,6 @@ const ResizablePreviewModal = ({ previewDoc, closePreview }: { previewDoc: Doc; 
         )}
       </div>
 
-      {/* Resize Handle - Bottom Right Corner */}
       <div
         onMouseDown={handleMouseDown}
         className="absolute bottom-0 right-0 w-8 h-8 cursor-nwse-resize group"
@@ -132,7 +127,6 @@ const ResizablePreviewModal = ({ previewDoc, closePreview }: { previewDoc: Doc; 
         <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-gray-400 group-hover:border-blue-500 transition-colors" />
       </div>
 
-      {/* Resize Indicators */}
       <div className="absolute bottom-2 left-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded">
         {size.width} × {size.height}
       </div>
@@ -153,7 +147,6 @@ export default function DashboardPage() {
   const [previewDoc, setPreviewDoc] = useState<Doc | null>(null);
   const [ocrLoading, setOcrLoading] = useState<string | null>(null);
 
-  // ✅ FIX 2 — Correct fetchExisting that properly maps MongoDB fields to Doc type
   const fetchExisting = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -185,7 +178,7 @@ export default function DashboardPage() {
           "";
 
         return {
-          id: doc.filename, // IMPORTANT: use filename for delete/OCR routes
+          id: doc.filename, 
           name: doc.originalName || doc.filename,
           size:
             typeof doc.size === "number"
@@ -213,7 +206,6 @@ export default function DashboardPage() {
     await fetchExisting();
   };
 
-  // ✅ FIX 3 — Correct delete route to /api/upload/:filename with auth header
   const handleDelete = async (doc: Doc) => {
     const confirmDelete = window.confirm(
       `Delete "${doc.name}"? This will remove the file and any OCR results permanently.`
@@ -248,7 +240,6 @@ export default function DashboardPage() {
     );
   }, [documents, searchQuery]);
 
-  // ✅ FIX 4 — OCR route kept as /ocr/run/:filename (unchanged from original)
   const runOCR = async (doc: Doc) => {
     const supportedTypes = ["png", "jpg", "jpeg", "webp", "pdf"];
     if (!doc.fileType || !supportedTypes.includes(doc.fileType)) {
@@ -392,7 +383,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
-      {/* Header - Now scrolls with page */}
       <motion.header 
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -400,7 +390,6 @@ export default function DashboardPage() {
         className="border-b bg-white/80 backdrop-blur-lg shadow-sm"
       >
         <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-          {/* Center-aligned title */}
           <div className="flex-1 text-center">
             <motion.div 
               className="inline-flex items-center gap-3 mb-2"
@@ -417,7 +406,6 @@ export default function DashboardPage() {
             <p className="text-gray-600 text-sm">Manage and process your documents with AI</p>
           </div>
 
-          {/* Logout button - positioned absolute to stay on right */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -430,7 +418,6 @@ export default function DashboardPage() {
         </div>
       </motion.header>
 
-      {/* Stat Cards - Removed Numbers */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statCards.map((card, index) => (
@@ -464,7 +451,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Documents Section */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -525,7 +511,6 @@ export default function DashboardPage() {
                       )}
                     </div>
 
-                    {/* Document Info */}
                     <div className="p-4">
                       <div className="font-semibold text-gray-900 truncate mb-2" title={doc.name}>
                         {doc.name}
@@ -535,7 +520,6 @@ export default function DashboardPage() {
                         {doc.size} • {new Date(doc.uploadDate).toLocaleDateString()}
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="flex gap-2 flex-wrap">
                         <button 
                           className="flex-1 px-3 py-1.5 text-xs border rounded-lg hover:bg-gray-50 transition-colors font-medium" 
@@ -584,7 +568,6 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* Upload Modal */}
       {uploadModalOpen && (
         <UploadModal
           open={uploadModalOpen}
@@ -593,7 +576,6 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* Preview Modal - Resizable */}
       <AnimatePresence>
         {previewDoc && (
           <motion.div 
@@ -618,7 +600,6 @@ export default function DashboardPage() {
         )}
       </AnimatePresence>
 
-      {/* Document Details Panel */}
       <DocumentDetailsPanel 
         open={detailsPanelOpen} 
         onOpenChange={setDetailsPanelOpen} 
@@ -626,7 +607,6 @@ export default function DashboardPage() {
         onAction={handleDocumentAction} 
       />
 
-      {/* OCR Loading Overlay */}
       <AnimatePresence>
         {ocrLoading && (
           <motion.div 

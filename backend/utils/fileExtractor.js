@@ -1,4 +1,3 @@
-// Node.js-only file extractor for PDF and DOCX
 import * as pdfParse from "pdf-parse";
 import mammoth from "mammoth";
 

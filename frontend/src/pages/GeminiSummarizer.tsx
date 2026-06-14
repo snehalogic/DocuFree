@@ -7,7 +7,6 @@ type SavedSummary = {
   date: string;
 };
 
-// ✅ Updated to match MongoDB document shape
 type OcrResultFile = {
   _id: string;
   filename: string;
@@ -31,15 +30,12 @@ const GeminiSummarizer: React.FC = () => {
   const [ocrError, setOcrError] = useState<string | null>(null);
 
   const API_BASE_URL = "http://localhost:5000";
-  const API_KEY = "AIzaSyC8glZ6x3_TXxRKbgHOST4wiVcRpD41rVs";//replace with your actual API key
-  const MODEL = "gemini-2.5-flash-lite";//change model tho sneha
 
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("summaries") || "[]");
     setSavedSummaries(data);
   }, []);
 
-  // ✅ FIXED — fetches from /api/documents (MongoDB), filters docs with extractedText
   const openOcrPicker = async () => {
     setShowOcrPicker(true);
     setOcrError(null);
@@ -54,7 +50,6 @@ const GeminiSummarizer: React.FC = () => {
 
       const docs = await res.json();
 
-      // Only show documents where OCR has been run
       const ocrDocs = Array.isArray(docs)
         ? docs.filter((d: any) => d.extractedText && d.extractedText.trim().length > 0)
         : [];
@@ -69,7 +64,6 @@ const GeminiSummarizer: React.FC = () => {
     }
   };
 
-  // ✅ FIXED — pastes extractedText directly from MongoDB, no extra fetch needed
   const handleUseOcrFile = (file: OcrResultFile) => {
     setInputText(file.extractedText);
     setShowOcrPicker(false);
@@ -347,7 +341,6 @@ const GeminiSummarizer: React.FC = () => {
           </div>
         )}
 
-        {/* ── OCR PICKER MODAL ── */}
         {showOcrPicker && (
           <div className="gs-ocr-overlay" onClick={() => setShowOcrPicker(false)}>
             <div className="gs-ocr-modal" onClick={(e) => e.stopPropagation()}>

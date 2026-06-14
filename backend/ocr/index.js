@@ -10,7 +10,6 @@ const RESULTS_DIR = path.join(process.cwd(), "results");
 
 if (!fs.existsSync(RESULTS_DIR)) fs.mkdirSync(RESULTS_DIR, { recursive: true });
 
-// Extract text from PDF using pdfjs-dist
 async function extractPdfText(filePath) {
   try {
     console.log("Reading PDF file...");
@@ -26,7 +25,6 @@ async function extractPdfText(filePath) {
     
     let fullText = "";
     
-    // Extract text from each page
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
       console.log(`Extracting text from page ${pageNum}/${numPages}...`);
       
@@ -65,7 +63,6 @@ async function extractPdfText(filePath) {
   }
 }
 
-// OCR for images
 async function ocrImage(filePath) {
   let worker = null;
   try {
@@ -90,7 +87,6 @@ async function ocrImage(filePath) {
   }
 }
 
-// Main OCR route (authenticated)
 router.post("/run/:filename", authMiddleware, async (req, res) => {
   const { filename } = req.params;
   
@@ -111,7 +107,6 @@ router.post("/run/:filename", authMiddleware, async (req, res) => {
     let extractedText = "";
     let additionalInfo = {};
     
-    // Handle PDF files
     if (fileExt === ".pdf") {
       console.log("Processing PDF file...");
       
@@ -129,7 +124,6 @@ router.post("/run/:filename", authMiddleware, async (req, res) => {
       additionalInfo.pages = result.pages;
       console.log(`✅ Extracted text from ${result.pages} pages`);
     } 
-    // Handle image files
     else if ([".png", ".jpg", ".jpeg", ".webp"].includes(fileExt)) {
       console.log("Processing image file...");
       extractedText = await ocrImage(filePath);
@@ -141,7 +135,6 @@ router.post("/run/:filename", authMiddleware, async (req, res) => {
       });
     }
 
-    // Check if we got any text
     if (!extractedText || extractedText.trim().length < 10) {
       return res.status(400).json({
         ok: false,
@@ -150,7 +143,6 @@ router.post("/run/:filename", authMiddleware, async (req, res) => {
       });
     }
 
-    // Save result
     await fs.promises.writeFile(resultPath, extractedText, "utf8");
     
     console.log(`✅ Text extraction completed for: ${filename}`);

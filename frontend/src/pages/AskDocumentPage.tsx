@@ -41,7 +41,6 @@ export default function AskDocumentPage() {
     <div style={{ padding: 40 }}>
       <h1>Ask Your Document</h1>
 
-      {/* DOCUMENT SELECT */}
       <select
         value={selectedDoc}
         onChange={(e) => setSelectedDoc(e.target.value)}
@@ -55,7 +54,6 @@ export default function AskDocumentPage() {
         ))}
       </select>
 
-      {/* QUESTION */}
       <textarea
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
@@ -64,7 +62,6 @@ export default function AskDocumentPage() {
         style={{ width: "100%", padding: 10 }}
       />
 
-      {/* ASK BUTTON */}
       <button
         onClick={handleAsk}
         disabled={loading}
@@ -79,7 +76,6 @@ export default function AskDocumentPage() {
         {loading ? "Thinking…" : "Ask"}
       </button>
 
-      {/* ANSWER */}
       {answer && (
         <div style={{ marginTop: 30 }}>
           <h3>Answer</h3>

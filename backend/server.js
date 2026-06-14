@@ -16,23 +16,19 @@ import qaRoutes from "./routes/qa.routes.js";
 import documentsRoutes from "./routes/documents.routes.js";
 import Document from "./models/Document.js";
 
-// -------------------- Initialize Express App --------------------
 const app = express();
 
-// Warm up the summarization model (loads in background)
 summarizationService.initialize().catch(err =>
   console.error("Model preload failed:", err)
 );
 
 dotenv.config();
 
-// -------------------- Directories Setup --------------------
 const PORT = process.env.PORT || 5000;
 const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 const RESULTS_DIR = path.join(process.cwd(), "results");
 const SUMMARIES_DIR = path.join("backend", "summarisedresults");
 
-// Create directories if they don't exist
 [UPLOAD_DIR, RESULTS_DIR, SUMMARIES_DIR].forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -40,7 +36,6 @@ const SUMMARIES_DIR = path.join("backend", "summarisedresults");
   }
 });
 
-// -------------------- Multer Setup --------------------
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => {
@@ -70,7 +65,6 @@ const upload = multer({
   },
 });
 
-// -------------------- CRITICAL MIDDLEWARE (ORDER MATTERS) --------------------
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -90,7 +84,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/translation", translationRoutes);
 
-// -------------------- Result File Endpoints (kept for OCR results page) --------------------
 app.put("/results/:filename", (req, res) => {
   const filename = decodeURIComponent(req.params.filename);
   if (!filename) return res.status(400).json({ success: false, error: "Missing filename" });
@@ -126,12 +119,10 @@ app.delete("/results/:filename", (req, res) => {
   }
 });
 
-// -------------------- Static File Serving --------------------
 app.use("/uploads", express.static(UPLOAD_DIR));
 app.use("/results", express.static(RESULTS_DIR));
 app.use("/summaries", express.static(SUMMARIES_DIR));
 
-// -------------------- Error Handling --------------------
 app.use((err, req, res, next) => {
   console.error("Global error:", err);
 
@@ -144,7 +135,6 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || "Internal server error" });
 });
 
-// -------------------- Health & Info Endpoints --------------------
 app.get("/", (req, res) => {
   res.json({
     message: "DocuFree Backend Server",
@@ -175,7 +165,6 @@ app.get("/health", (req, res) => {
   });
 });
 
-// -------------------- Auto Cleanup (MongoDB-driven, 10 Days) --------------------
 const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
 
 async function autoCleanup() {
@@ -189,14 +178,12 @@ async function autoCleanup() {
     });
 
     for (const doc of expiredDocs) {
-      // Delete the uploaded file
       const filePath = path.join(UPLOAD_DIR, doc.filename);
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
         console.log(`🗑 Deleted expired file: ${doc.filename}`);
       }
 
-      // Delete corresponding OCR result if exists
       const resultPath = path.join(RESULTS_DIR, `${doc.filename}.txt`);
       if (fs.existsSync(resultPath)) {
         fs.unlinkSync(resultPath);
@@ -212,10 +199,8 @@ async function autoCleanup() {
   }
 }
 
-// Run every 24 hours
 setInterval(autoCleanup, 24 * 60 * 60 * 1000);
 
-// -------------------- MongoDB Connection & Server Start --------------------
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -233,7 +218,6 @@ mongoose
     process.exit(1);
   });
 
-// Graceful shutdown
 process.on("SIGTERM", () => {
   console.log("SIGTERM received, shutting down...");
   mongoose.connection.close(() => {

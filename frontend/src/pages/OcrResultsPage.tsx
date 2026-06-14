@@ -7,8 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
 type OcrResult = {
-  id: string;          // MongoDB _id
-  filename: string;    // stored filename e.g. 1234-photo.jpg
+  id: string;          
+  filename: string;   
   originalName: string;
   text: string;
   charCount: number;
@@ -30,7 +30,6 @@ export default function OcrResultsPage() {
     fetchOcrResults();
   }, []);
 
-  // ✅ FIXED — uses MongoDB /api/documents instead of deleted index.json
   const fetchOcrResults = async () => {
     try {
       setLoading(true);
@@ -40,13 +39,11 @@ export default function OcrResultsPage() {
       const headers: Record<string, string> = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      // Fetch all documents for this user from MongoDB
       const res = await axios.get("http://localhost:5000/api/documents", { headers });
       const docs = res.data;
 
       if (!Array.isArray(docs)) return setOcrResults([]);
 
-      // Only show documents that have extractedText (OCR has been run)
       const results: OcrResult[] = docs
         .filter((doc: any) => doc.extractedText && doc.extractedText.trim().length > 0)
         .map((doc: any) => ({
@@ -89,7 +86,6 @@ export default function OcrResultsPage() {
     }
   };
 
-  // ✅ FIXED — delete uses /api/upload/:filename (MongoDB + disk cleanup)
   const handleDelete = async (result: OcrResult, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!window.confirm(`Are you sure you want to delete ${result.originalName}?`)) return;
@@ -121,7 +117,6 @@ export default function OcrResultsPage() {
     setEditedText("");
   };
 
-  // ✅ FIXED — save updates the .txt file on disk via existing PUT /results/:filename route
   const handleSaveDocument = async () => {
     if (!selectedResult) return;
     try {
@@ -367,7 +362,6 @@ export default function OcrResultsPage() {
         }
       `}</style>
 
-      {/* Background */}
       <div className="ocr-bg">
         <div className="ocr-blob ocr-blob-1" />
         <div className="ocr-blob ocr-blob-2" />
@@ -376,7 +370,6 @@ export default function OcrResultsPage() {
       </div>
 
       <div className="ocr-wrapper">
-        {/* TOP BAR */}
         <div className="ocr-topbar">
           <motion.button
             className="ocr-back-btn"
@@ -403,7 +396,6 @@ export default function OcrResultsPage() {
           </div>
         </div>
 
-        {/* CONTENT */}
         {loading ? (
           <div className="ocr-loading">
             <div className="ocr-spinner" />
@@ -484,7 +476,6 @@ export default function OcrResultsPage() {
         </div>
       </div>
 
-      {/* MODAL */}
       <AnimatePresence>
         {selectedResult && (
           <motion.div

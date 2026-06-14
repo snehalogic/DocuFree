@@ -10,23 +10,21 @@ interface Message {
 }
 
 // ── Gemini config ─────────────────────────────────────────────────────────────
-// Replace with your actual Gemini API key from https://aistudio.google.com/app/apikey
-const GEMINI_API_KEY = "AIzaSyCCw0OilEfGtHiBN8mwOPBp8lERVnWa3B8";//replace with your actual API key //done
-const GEMINI_MODEL   = "gemini-2.5-flash-lite";
-const GEMINI_URL     = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 
-// ── Call Gemini API ───────────────────────────────────────────────────────────
+const GEMINI_URL =
+  `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+
 async function callGemini(
   userMessage: string,
   history: Message[]
 ): Promise<string> {
-  // Build conversation history in Gemini format (alternating user/model turns)
   const contents = history.map((m) => ({
     role: m.role === "user" ? "user" : "model",
     parts: [{ text: m.text }],
   }));
 
-  // Add the new user message
   contents.push({ role: "user", parts: [{ text: userMessage }] });
 
   const response = await fetch(GEMINI_URL, {
@@ -62,9 +60,6 @@ async function callGemini(
   return text.trim();
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-//  Everything below is UNCHANGED from the original
-// ═════════════════════════════════════════════════════════════════════════════
 
 const AuroraBackground = () => (
   <div style={{ position: "fixed", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
@@ -257,7 +252,6 @@ export default function AiAssistant() {
       timestamp: new Date(),
     };
 
-    // Capture history BEFORE adding new user message (for context)
     const historyForApi = [...chat];
 
     setChat((prev) => [...prev, userMsg]);
@@ -328,7 +322,6 @@ export default function AiAssistant() {
           fontFamily: "'Syne', sans-serif",
         }}
       >
-        {/* ── HEADER ─────────────────────────────── */}
         <motion.header
           initial={{ y: -24, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -390,7 +383,6 @@ export default function AiAssistant() {
           </motion.button>
         </motion.header>
 
-        {/* ── CHAT WINDOW ──────────────────────────── */}
         <motion.div
           initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -460,7 +452,6 @@ export default function AiAssistant() {
           <div ref={messagesEndRef} />
         </motion.div>
 
-        {/* ── INPUT ─────────────────────────────────── */}
         <motion.div
           initial={{ y: 24, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

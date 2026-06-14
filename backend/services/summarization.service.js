@@ -1,4 +1,3 @@
-// ==================== summarization.service.js ====================
 
 import { pipeline } from '@xenova/transformers';
 import * as pdfParse from 'pdf-parse';
@@ -8,10 +7,9 @@ class SummarizationService {
     this.summarizer = null;
     this.isLoading = false;
     this.isReady = false;
-    this.modelName = 'Xenova/t5-small'; // lighter model for faster load (~300MB)
+    this.modelName = 'Xenova/t5-small'; 
   }
 
-  // 🔹 Initialize model
   async initialize() {
     if (this.isReady) return;
     if (this.isLoading) {
@@ -42,7 +40,6 @@ class SummarizationService {
     }
   }
 
-  // 🔹 Clean text utility
   cleanText(text) {
     return text
       .replace(/\s+/g, ' ')
@@ -50,7 +47,6 @@ class SummarizationService {
       .trim();
   }
 
-  // 🔹 Summarize a single chunk
   async summarizeChunk(text, lengthPercent = 30) {
     if (!this.isReady) await this.initialize();
 
@@ -60,7 +56,6 @@ class SummarizationService {
     const words = cleaned.split(/\s+/).length;
     if (words < 30) return cleaned;
 
-    // smaller model → shorter max context
     const targetWords = Math.max(Math.floor(words * lengthPercent / 100), 20);
     const minLength = Math.max(Math.floor(targetWords * 0.7 / 1.3), 10);
     const maxLength = Math.min(Math.floor(targetWords * 1.3 / 1.3), 120);
@@ -77,7 +72,6 @@ class SummarizationService {
     return result[0].summary_text;
   }
 
-  // 🔹 Split text into smaller chunks (~250 words)
   chunkText(text, maxWords = 250) {
     const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
     const chunks = [];
@@ -100,7 +94,6 @@ class SummarizationService {
     return chunks.length ? chunks : [text];
   }
 
-  // ✅ 🔹 NEW: Summarize full text by chunking and combining results
   async summarizeText(fullText, lengthPercent = 30) {
     if (!this.isReady) await this.initialize();
 

@@ -8,16 +8,13 @@ import summarizationService from "../services/summarization.service.js";
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Directory for saved summaries
 const SUMMARIES_DIR = path.join(process.cwd(), "backend", "summarisedresults");
 
-// ✅ Ensure directory exists
 if (!fs.existsSync(SUMMARIES_DIR)) {
   fs.mkdirSync(SUMMARIES_DIR, { recursive: true });
   console.log(`📁 Created directory: ${SUMMARIES_DIR}`);
 }
 
-// ✅ Ensure model is ready
 async function ensureModelReady() {
   try {
     if (!summarizationService.isReady) {
@@ -31,7 +28,6 @@ async function ensureModelReady() {
   }
 }
 
-// 🔹 TEXT SUMMARIZATION
 router.post("/text", async (req, res) => {
   try {
     console.log("\n🔵 [Text Summarization Request]");
@@ -54,7 +50,6 @@ router.post("/text", async (req, res) => {
   }
 });
 
-// 🔹 FILE SUMMARIZATION (PDF / DOCX)
 router.post("/file", upload.single("file"), async (req, res) => {
   try {
     console.log("\n📄 [File Summarization Request]");
@@ -87,7 +82,6 @@ router.post("/file", upload.single("file"), async (req, res) => {
   }
 });
 
-// 🔹 SAVE SUMMARY
 router.post("/save", async (req, res) => {
   try {
     console.log("\n💾 [Save Summary Request]");
@@ -121,7 +115,6 @@ router.post("/save", async (req, res) => {
   }
 });
 
-// 🔹 GET ALL SUMMARIES
 router.get("/", async (req, res) => {
   try {
     console.log("\n📚 [Fetch All Summaries]");
@@ -154,7 +147,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// 🔹 GET SINGLE SUMMARY
 router.get("/:filename", async (req, res) => {
   try {
     const filename = req.params.filename;
@@ -172,7 +164,6 @@ router.get("/:filename", async (req, res) => {
   }
 });
 
-// 🔹 DELETE SUMMARY
 router.delete("/:filename", async (req, res) => {
   try {
     const filepath = path.join(SUMMARIES_DIR, req.params.filename);

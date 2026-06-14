@@ -36,7 +36,6 @@ router.post("/ask", async (req, res) => {
 
     const raw = fs.readFileSync(filePath, "utf8");
 
-// 🔥 FORCE STRING
 const context = typeof raw === "string"
   ? raw.slice(0, 3000)
   : String(raw).slice(0, 3000);
@@ -51,7 +50,6 @@ if (typeof question !== "string") {
 }
 
 
-    // ✅ THEN CALL MODEL
     const output = await qa({
   question: String(question),
   context: String(context),

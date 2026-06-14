@@ -5,11 +5,9 @@ import {
   Zap, Shield, Globe
 } from "lucide-react";
 
-// ── Types ────────────────────────────────────────────────
 type ConversionOption = { label: string; value: string };
 type Step = "pick-tool" | "upload" | "converting" | "done";
 
-// ── Conversion map matching Python backend ───────────────
 const CONVERSION_MAP: Record<string, ConversionOption[]> = {
   jpg:  [{ label:"PNG",value:"png"},{ label:"WEBP",value:"webp"},{ label:"GIF",value:"gif"},{ label:"BMP",value:"bmp"},{ label:"TIFF",value:"tiff"},{ label:"PDF",value:"pdf"}],
   jpeg: [{ label:"PNG",value:"png"},{ label:"WEBP",value:"webp"},{ label:"GIF",value:"gif"},{ label:"BMP",value:"bmp"},{ label:"TIFF",value:"tiff"},{ label:"PDF",value:"pdf"}],
@@ -28,7 +26,6 @@ const CONVERSION_MAP: Record<string, ConversionOption[]> = {
   html: [{ label:"PDF",value:"pdf"},{ label:"TXT",value:"txt"}],
 };
 
-// ── Tool definitions ─────────────────────────────────────
 const TOOLS = [
   { id:"pdf-to-word",  from:"pdf",  to:"docx", title:"PDF to Word",       desc:"Convert PDFs into editable Word documents",       icon:"📄", accent:"#ef4444" },
   { id:"word-to-pdf",  from:"docx", to:"pdf",  title:"Word to PDF",       desc:"Turn .docx files into universal PDFs",             icon:"📝", accent:"#3b82f6" },
@@ -48,7 +45,6 @@ const getExt = (name: string) => name.split(".").pop()?.toLowerCase() || "";
 const fmtSize = (b: number) =>
   b < 1024 * 1024 ? `${(b / 1024).toFixed(1)} KB` : `${(b / 1024 / 1024).toFixed(2)} MB`;
 
-// ── Main Component ───────────────────────────────────────
 const FileConverterPage: React.FC = () => {
   const [step, setStep]           = useState<Step>("pick-tool");
   const [activeTool, setActiveTool] = useState<typeof TOOLS[0] | null>(null);
@@ -407,7 +403,6 @@ const FileConverterPage: React.FC = () => {
       <div className="page-bg" />
 
       <div className="wrap">
-        {/* TOP NAV */}
         <nav className="topnav">
           <button className="back-btn" onClick={() => (window.location.href = "/dashboard")}>
             <ArrowLeft size={13} /> Dashboard
@@ -415,7 +410,6 @@ const FileConverterPage: React.FC = () => {
           <div className="brand">DOCUFREE<b>.</b>AI</div>
         </nav>
 
-        {/* ─────── STEP 1: PICK TOOL ─────── */}
         {step === "pick-tool" && (
           <>
             <div className="hero">
@@ -469,7 +463,6 @@ const FileConverterPage: React.FC = () => {
           </>
         )}
 
-        {/* ─────── STEP 2: UPLOAD ─────── */}
         {step === "upload" && (
           <div className="panel">
             <div className="panel-head">
@@ -555,7 +548,6 @@ const FileConverterPage: React.FC = () => {
           </div>
         )}
 
-        {/* ─────── STEP 3: CONVERTING ─────── */}
         {step === "converting" && (
           <div className="conv-screen">
             <div className="spinner" />
@@ -573,7 +565,6 @@ const FileConverterPage: React.FC = () => {
           </div>
         )}
 
-        {/* ─────── STEP 4: DONE ─────── */}
         {step === "done" && (
           <div className="done-screen">
             <div className="done-icon"><CheckCircle2 size={36} /></div>

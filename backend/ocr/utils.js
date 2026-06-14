@@ -3,7 +3,6 @@ import { createWorker } from "tesseract.js";
 import path from "path";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 
-// OCR for images using Tesseract
 export async function ocrImage(filePath) {
   let worker = null;
   try {
@@ -26,7 +25,6 @@ export async function ocrImage(filePath) {
   }
 }
 
-// Extract text from PDF using pdfjs-dist (pure ESM, no Ghostscript needed)
 export async function ocrPDF(filePath) {
   try {
     console.log(`Extracting text from PDF: ${filePath}`);
@@ -66,7 +64,6 @@ export async function ocrPDF(filePath) {
   }
 }
 
-// Save OCR result to backend/results/filename.txt
 export async function saveOCRResult(filename, text) {
   try {
     const resultDir = path.join(process.cwd(), "results");
