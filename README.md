@@ -1,81 +1,60 @@
-![React](https://img.shields.io/badge/Frontend-React-blue)
-![Node](https://img.shields.io/badge/Backend-Node.js-green)
-![AI](https://img.shields.io/badge/AI-Gemini-orange)
-![OCR](https://img.shields.io/badge/OCR-Tesseract-red)
-# DocuFree
+# DocuFree - AI-Powered Document Summarization and OCR Platform
+DocuFree is an innovative platform that leverages AI and machine learning to provide accurate document summarization and optical character recognition (OCR) capabilities, streamlining document processing and analysis.
 
-DocuFree is an AI-powered document processing web application that allows users to extract, summarize, translate, convert, interact with, and listen to documents using modern AI technologies.
+## 🏗️ Architecture
+The DocuFree platform consists of a backend server built using Node.js and Express.js, which handles document uploads, processing, and summarization. The backend utilizes various libraries, including `@google/generative-ai` and `@xenova/transformers`, to perform AI-powered document summarization. Additionally, the platform employs `libreoffice-convert` and `pdf-lib` to handle document conversions. The frontend is built using React and Radix UI, providing a user-friendly interface for uploading documents and viewing summarized results.
 
----
+## ⚙️ Tech Stack
+The following technologies are used in the DocuFree platform:
+* Node.js
+* Express.js
+* `@google/generative-ai`
+* `@xenova/transformers`
+* `libreoffice-convert`
+* `pdf-lib`
+* React
+* Radix UI
+* `axios`
+* `bcryptjs`
+* `cors`
+* `multer`
+* `sharp`
+* `mime-types`
 
-## Features
+## 📁 Project Structure
+The project is organized into the following key files and folders:
+* `backend`: Contains the server-side code, including the Express.js server, document processing logic, and AI-powered summarization models.
+* `backend/models`: Defines the database models for documents, summaries, and users.
+* `backend/ocr`: Handles optical character recognition (OCR) using `tesseract.js`.
+* `backend/results`: Stores the summarized results of processed documents.
+* `frontend`: Contains the client-side code, including the React application and Radix UI components.
+* `package.json`: Defines the project dependencies and scripts.
 
-- OCR-based document text extraction  
-- AI-powered text summarization  
-- AI-powered document Q&A  
-- Multi-language translation  
-- Text-to-Speech conversion  
-- Document format conversion (PDF, Word, JPG, PNG, etc.)  
-- Clean and user-friendly interface  
+## 🚀 Getting Started
+To set up the DocuFree platform, follow these steps:
+1. Clone the repository: `git clone https://github.com/snehalogic/DocuFree.git`
+2. Install dependencies: `npm install`
+3. Start the backend server: `npm run start`
+4. Start the frontend development server: `npm run dev`
+5. Access the platform at `http://localhost:3000`
 
----
+## 📖 Usage
+To use the DocuFree platform, follow these steps:
+1. Upload a document using the file upload interface.
+2. Select the document type and processing options.
+3. Click the "Process" button to initiate document summarization and OCR.
+4. View the summarized results in the dashboard.
 
-## Tech Stack
+## 🔑 Environment Variables
+The following environment variables are required:
+* `NODE_ENV`: Set to `development` or `production`
+* `PORT`: Set to the desired port number (default: 3000)
+* `DATABASE_URL`: Set to the database connection URL
 
-### Frontend
-- React
-- TypeScript
-- Tailwind CSS
-
-### Backend
-- Node.js
-- Express
-- Python
-
-### AI Services
-- Google Gemini API
-- OCR processing using Tesseract.js
-
----
-
-## Screenshots
-### Document Upload
-![Upload](screenshots/upload.png)
-
-### OCR Extraction
-![OCR](screenshots/ocr.png)
-
-### AI Summarization
-![Summary](screenshots/summary.png)
-
-### Translation
-![Translation](screenshots/translation.png)
-
-### AI Assistance (Q&A)
-![AI Assistance](screenshots/ai_assistance.png)
-
-### Document Converter
-![Converter](screenshots/file_converter.png)
----
-
-## Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/snehalogic/DocuFree.git
-```
-
-## Install dependencies:
-npm install
-
-## Create a .env file and add:
-- GEMINI_API_KEY=your_api_key
-- MONGODB_URI=your_database_uri
-
-## Run the project:
-npm start
-
-## Future Improvements
-- Cloud document storage
-- Voice-controlled document assistant
+## 🤝 Contributing
+To contribute to the DocuFree platform, please follow these steps:
+1. Fork the repository: `git fork https://github.com/snehalogic/DocuFree.git`
+2. Create a new branch: `git branch feature/your-feature`
+3. Commit your changes: `git commit -m "Your commit message"`
+4. Push your changes: `git push origin feature/your-feature`
+5. Submit a pull request to the main repository.
